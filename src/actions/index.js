@@ -1,12 +1,17 @@
-export const FETCH_DATA = 'fetch_data';
+export const ADD_OUTPUT_LINE = 'ADD_OUTPUT_LINE';
+export const CLEAR_OUTPUTS = 'CLEAR_OUTPUTS';
 
-// default function to display redux action format
-export function defaultFunction() {
-    let testVar = 'Hello';
+let nextOutputLineId = 0;
+export function addOutputLine(line) {
+    return { 
+        type: ADD_OUTPUT_LINE, 
+        id: nextOutputLineId++,
+        line: line
+    }
+}
 
-    // action object format being return to a reducer
-    return {
-        type: FETCH_DATA,
-        payload: testVar
+export function clearOutputs() {
+    return { 
+        type: CLEAR_OUTPUTS
     }
 }

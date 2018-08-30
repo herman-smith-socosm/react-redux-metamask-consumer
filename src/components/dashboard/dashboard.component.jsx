@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
+import Web3AccountProvider from '../../services/web3/account-provider';
 
 const DashboardConsole = styled.div`
   background-color: lightblue;
@@ -35,7 +36,7 @@ const Button = styled.button`
 
 const TerminalConsole = styled.div`
   border-radius: 5px;
-  height: 555px;
+  height: 780px;
   background-color: black;
   color: yellow;
   font-size: 13px;
@@ -44,29 +45,47 @@ const TerminalConsole = styled.div`
   padding: 10px;
 `;
 
-const TerminalWindow = styled.textarea`
-  width: 100%;
-  height: 100%;
-  backround-color: black;
-  color: yellow;
+const OutputLineList = styled.ul`
+  list-style: none;
 `;
 
 class Dashboard extends Component {
 
+  addLine = () => {
+    this.props.addOutputLine("line content");
+  }
+
+  getAccount() {
+    this.setState();
+    this.state.outputLines.push(Web3AccountProvider.getAccount());
+  }
+
+  clearTerminal = () => {
+    this.props.clearOutputs();
+  }
+
   render() {
+
+    const outputLines = this.props.outputLines.map((outputLine)=>{
+      console.log(`outputLine: ${JSON.stringify(outputLine)}`);
+      return (
+        <li key={outputLine.id}>
+          {outputLine.line}
+        </li>
+      );
+    });
+
     return (
       <DashboardConsole>
         <ControlStrip>
+          <Button onClick={this.addLine}>Add Line</Button>
           <Button onClick={this.getAccount}>Get Account</Button>
-          <Button onClick={this.checkProvider}>Check provider</Button>
-          <Button onClick={this.getNetwork}>Get network</Button>
-          <Button onClick={this.getNetworkId}>Get network id</Button>
-          <Button onClick={this.getMethods}>Methods</Button>
-          <Button onClick={this.checkBalance}>Check my balance</Button>
-          <Button onClick={this.owner}>Owner</Button>
-          <Button onClick={this.transfer}>Transfer</Button>
         </ControlStrip>
-        <TerminalConsole>...</TerminalConsole>
+        <TerminalConsole>
+          <OutputLineList>
+            {outputLines}
+          </OutputLineList>
+        </TerminalConsole>
         <ControlStrip style={{border: 0}}>
           <Button onClick={this.clearTerminal}>Clear</Button>
         </ControlStrip>
