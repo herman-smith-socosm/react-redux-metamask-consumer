@@ -47,17 +47,15 @@ const TerminalConsole = styled.div`
 
 const OutputLineList = styled.ul`
   list-style: none;
+  padding-inline-start: 10px;
 `;
 
 class Dashboard extends Component {
 
-  addLine = () => {
-    this.props.addOutputLine("line content");
-  }
-
-  getAccount() {
+  getAccount = () => {
     this.setState();
-    this.state.outputLines.push(Web3AccountProvider.getAccount());
+    const account = Web3AccountProvider.getAccount();
+    this.props.addOutputLine(account?account:"undefined");
   }
 
   clearTerminal = () => {
@@ -78,7 +76,6 @@ class Dashboard extends Component {
     return (
       <DashboardConsole>
         <ControlStrip>
-          <Button onClick={this.addLine}>Add Line</Button>
           <Button onClick={this.getAccount}>Get Account</Button>
         </ControlStrip>
         <TerminalConsole>
