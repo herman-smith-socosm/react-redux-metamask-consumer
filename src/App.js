@@ -1,9 +1,8 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
-import './App.css';
-
 import { connect } from 'react-redux';
 import { defaultFunction } from './actions';
+import Dashboard from './components/dashboard/index'; 
+import InstallMetaMask from './components/web3/install-metamask/install-metamask-component';
 
 class App extends Component {
 
@@ -11,13 +10,10 @@ class App extends Component {
     // call default function to display redux operation
     this.props.defaultFunction();
   }
-
+  
   render() {
-    return (
-      <div>
-        React Redux Starter Template
-      </div>
-    );
+    const { web3 } = window;
+    return web3?(<Dashboard/>):(<InstallMetaMask/>);
   }
 }
 
