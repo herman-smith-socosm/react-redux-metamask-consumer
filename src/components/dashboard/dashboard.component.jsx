@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
+import config from 'react-global-configuration';
 import styled from 'styled-components';
-import Web3AccountProvider from '../../services/web3/account-provider';
+import Web3Proxy from '../../web3/web3-proxy';
 
 const DashboardConsole = styled.div`
   background-color: lightblue;
@@ -52,10 +53,28 @@ const OutputLineList = styled.ul`
 
 class Dashboard extends Component {
 
+  constructor (props) {
+    super(props);
+    this.web3Proxy = new Web3Proxy(config.get('desiredNetwork'));
+  }
+
   getAccount = () => {
-    this.setState();
-    const account = Web3AccountProvider.getAccount();
+    const account = this.web3Proxy.getAccount();
     this.props.addOutputLine(account?account:"undefined");
+  }
+
+  getNetwork = () => {
+    this.web3Proxy.getNetwork().then(network=>{
+      this.props.addOutputLine(network);  
+    }).catch(reason=>{
+      this.props.addOutputLine(reason);  
+    });
+  }
+
+  isExpectedNetwork = () => {
+    this.web3Proxy.isDesiredNetwork().then(isNetwork=>{
+      this.props.addOutputLine(isNetwork?"TRUE":"FALSE");  
+    });
   }
 
   clearTerminal = () => {
@@ -77,6 +96,8 @@ class Dashboard extends Component {
       <DashboardConsole>
         <ControlStrip>
           <Button onClick={this.getAccount}>Get Account</Button>
+          <Button onClick={this.getNetwork}>Get Network</Button>
+          <Button onClick={this.isExpectedNetwork}>Is Expected Network</Button>
         </ControlStrip>
         <TerminalConsole>
           <OutputLineList>

@@ -10,6 +10,10 @@ import logger from 'redux-logger';
 import reducers from './reducers';
 import ReduxPromise from 'redux-promise';
 
+import globalConfig from 'react-global-configuration';
+import config from './config/global';
+globalConfig.set(config);
+
 const store = createStore(
     reducers,
     applyMiddleware(logger, ReduxPromise)

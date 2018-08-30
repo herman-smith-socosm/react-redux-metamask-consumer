@@ -1,13 +1,15 @@
-import config from 'react-global-configuration';
-
+/* eslint-disable */
 import { 
     MAIN_NETWORK,
     ROPSTEN_NETWORK,
     MORDEN_NETWORK,
     PRIVATE_NETWORK,
-} from './networks';
+} from '../web3/networks';
+/* eslint-enable */
 
-config.set({ 
-  CONTRACT_ADDRESS: '',
-  DESIRED_NETWORK: PRIVATE_NETWORK
-});
+const config = { 
+  contractAddress: '',
+  desiredNetwork: PRIVATE_NETWORK
+};
+
+export default config;
