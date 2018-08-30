@@ -24,7 +24,6 @@ export default class Web3Proxy {
 
     getAccount = () => {
         this._web3.eth.getAccounts(accounts=>{
-            debugger;
             console.log(`accounts: ${JSON.stringify(accounts)}`);
         });
         return this._web3.eth.defaultAccount;
