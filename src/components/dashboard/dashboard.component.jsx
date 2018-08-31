@@ -61,7 +61,7 @@ class Dashboard extends Component {
   getAccount = () => {
     // const account = this.web3Proxy.getAccount();
     // this.props.addOutputLine(account?account:"undefined");
-    this.web3Proxy.getAccounts().then(account=>{
+    this.web3Proxy.getAccount().then(account=>{
       this.props.addOutputLine(account);  
     });
   }
@@ -69,6 +69,13 @@ class Dashboard extends Component {
   getAccounts = () => {
     this.web3Proxy.getAccounts().then(accounts=>{
       this.props.addOutputLine(JSON.stringify(accounts));  
+    });
+  }
+
+  getBalance = () => {
+    this.web3Proxy.getAccounts().then(account=>{
+      debugger;
+      this.props.addOutputLine(account.balance);  
     });
   }
 
@@ -111,6 +118,7 @@ class Dashboard extends Component {
       <DashboardConsole>
         <ControlStrip>
           <Button onClick={this.getAccount}>Get Account</Button>
+          <Button onClick={this.getBalance}>Get Balance</Button>
           <Button onClick={this.getAccounts}>Get Accounts</Button>
           <Button onClick={this.getDesiredNetwork}>Get Desired Network</Button>
           <Button onClick={this.getNetwork}>Get Network</Button>

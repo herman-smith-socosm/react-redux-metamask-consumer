@@ -25,7 +25,6 @@ const _networks = [
 
 const networks = {
     get: (id=undefined) => {
-        debugger;
         let result = _networks.find(network=>{return id === network.id});
         return result?result:_networks[0];
     }
