@@ -35,6 +35,17 @@ const Button = styled.button`
   font-size: 14px;
 `;
 
+const Stepper = styled.input`
+  height: 25px;
+  min-width: 150px;
+  color: black;
+  background: lightgrey;
+	border: 1px solid black;
+  border-radius: 2.5px;
+  margin: auto;
+  font-size: 14px;
+`;
+
 const TerminalConsole = styled.div`
   border-radius: 5px;
   height: 780px;
@@ -130,12 +141,13 @@ class Dashboard extends Component {
         <ControlStrip>
           <Button onClick={this.getDefaultAccount}>Get Default Account</Button>
           <Button onClick={this.setDefaultAccount}>Set Default Account</Button>
-          <Button onClick={this.getAccount}>Get Account</Button>
-          <Button onClick={this.getAccounts}>Get Accounts</Button>
-          <Button onClick={this.getBalance}>Get Balance</Button>
-          <Button onClick={this.getDesiredNetwork}>Get Desired Network</Button>
+          <Button onClick={this.getAccounts}>Accounts</Button>
+          <Button onClick={this.getBalance}>Balance</Button>
+          <Button onClick={this.getDesiredNetwork}>Desired Network</Button>
           <Button onClick={this.getNetwork}>Get Network</Button>
           <Button onClick={this.isExpectedNetwork}>Is Expected Network</Button>
+          <Stepper type={"number"} name={"points"} step={1000} min={0}/>
+          <Button onClick={this.transfer}>Transfer</Button>
         </ControlStrip>
         <TerminalConsole>
           <OutputLineList>
