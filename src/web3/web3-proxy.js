@@ -4,60 +4,51 @@ import networks from '../web3/networks';
 
 export default class Web3Proxy {
 
-    constructor(desiredNetwork=undefined) {
-        this._desiredNetwork = desiredNetwork;
+    constructor(defaultNetwork=networks.MAIN_NETWORK) {
+        this._defaultNetwork = defaultNetwork;
         const { web3 } = window;
         if (web3) {
+            this._web3old = window.web3;
             this.initWithCurrentProvider(web3.currentProvider);
         }
     }
 
-    initWithCurrentProvider = (currentProvider) => {
-        // const web3 = new Web3(window.web3.currentProvider);
-        // const windowWeb3 = window.web3;
-        // debugger;
-
-        this._web3 = new Web3(currentProvider)
-    }
-
-    getAccount = () => {
-        return new Promise((resolve, reject) => {
-            const account = (this._web3.eth.accounts.length > 0)?this._web3.eth.accounts[0]:undefined;
-            resolve(account);
-        })        
+    initWithCurrentProvider = (provider) => {
+        this._web3 = new Web3(provider)
     }
 
     getAccounts = () => {
-        return new Promise((resolve, reject) => {
-            resolve(this._web3.eth.accounts);
-        })
+        return this._web3.eth.getAccounts();
+    }
+
+    getBalance = (account) => {
+        return this._web3.eth.getBalance(account);
+    }    
+    
+    getDefaultAccount = () => {
+        return this._web3.eth.defaultAccount;
+    }
+    
+    setDefaultAccount = (account) => {
+        this._web3.eth.defaultAccount = account;
     }
 
     getNetwork = () => {
-        return new Promise((resolve, reject) => {
-            this._web3.version.getNetwork((error, netId) => {
-                if (error) {
-                    reject(error);
-                }
-                resolve(networks.get(netId));
-            });
-        })
+        return this._web3.eth.net.getNetworkType();
     }
 
-    getDesiredNetwork = () => {
-        return new Promise((resolve, reject) => {
-            resolve(networks.get(this._desiredNetwork));
-        })        
+    getDefaultNetwork = () => {
+        return this._defaultNetwork;
+    }
+
+    setDefaultNetwork = (defaultNetwork) => {
+        this._defaultNetwork = defaultNetwork;
     }
 
     isDesiredNetwork = () => {
-        return new Promise((resolve, reject) => {
-            this._web3.version.getNetwork((error, netId) => {
-                if (error) {
-                    resolve(false);
-                }
-                resolve(this._desiredNetwork === netId);
-            });
+        const defaultNetwork = this._defaultNetwork;
+        return this._web3.eth.net.getNetworkType().then(network=>{
+            return new Promise(resolve => resolve(defaultNetwork === network))
         });
     }
 }

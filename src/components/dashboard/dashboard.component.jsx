@@ -58,10 +58,21 @@ class Dashboard extends Component {
     this.web3Proxy = new Web3Proxy(config.get('desiredNetwork'));
   }
 
+  getDefaultAccount = () => {
+    const account = this.web3Proxy.getDefaultAccount();
+    this.props.addOutputLine(account?account:"not set");
+  }
+
+  setDefaultAccount = () => {
+    this.web3Proxy.getAccounts().then(accounts=>{
+      const account = (accounts.length > 0)?accounts[0]:"no account";
+      this.web3Proxy.setDefaultAccount(account);
+    });
+  }
+
   getAccount = () => {
-    // const account = this.web3Proxy.getAccount();
-    // this.props.addOutputLine(account?account:"undefined");
-    this.web3Proxy.getAccount().then(account=>{
+    this.web3Proxy.getAccounts().then(accounts=>{
+      const account = (accounts.length > 0)?accounts[0]:"no account";
       this.props.addOutputLine(account);  
     });
   }
@@ -73,30 +84,30 @@ class Dashboard extends Component {
   }
 
   getBalance = () => {
-    this.web3Proxy.getAccounts().then(account=>{
-      debugger;
-      this.props.addOutputLine(account.balance);  
+    this.web3Proxy.getAccounts().then(accounts=>{
+      const account = (accounts.length > 0)?accounts[0]:undefined;
+      if (account) {
+        this.web3Proxy.getBalance(account).then(balance=>{
+          this.props.addOutputLine(`${account}: ${balance}`);
+        })
+      }
     });
   }
 
   getDesiredNetwork = () => {
-    this.web3Proxy.getDesiredNetwork().then(network=>{
-      this.props.addOutputLine(network.name);  
-    });
+    this.props.addOutputLine(this.web3Proxy.getDefaultNetwork());
   }
 
   getNetwork = () => {
     this.web3Proxy.getNetwork().then(network=>{
-      this.props.addOutputLine(network.name);  
-    }).catch(reason=>{
-      this.props.addOutputLine(reason);  
-    });
+      this.props.addOutputLine(network);
+    }) 
   }
 
   isExpectedNetwork = () => {
-    this.web3Proxy.isDesiredNetwork().then(isNetwork=>{
-      this.props.addOutputLine(isNetwork?"TRUE":"FALSE");  
-    });
+    this.web3Proxy.isDesiredNetwork().then(isExpected=>{
+      this.props.addOutputLine(isExpected?"TRUE":"FALSE");
+    })
   }
 
   clearTerminal = () => {
@@ -117,9 +128,11 @@ class Dashboard extends Component {
     return (
       <DashboardConsole>
         <ControlStrip>
+          <Button onClick={this.getDefaultAccount}>Get Default Account</Button>
+          <Button onClick={this.setDefaultAccount}>Set Default Account</Button>
           <Button onClick={this.getAccount}>Get Account</Button>
-          <Button onClick={this.getBalance}>Get Balance</Button>
           <Button onClick={this.getAccounts}>Get Accounts</Button>
+          <Button onClick={this.getBalance}>Get Balance</Button>
           <Button onClick={this.getDesiredNetwork}>Get Desired Network</Button>
           <Button onClick={this.getNetwork}>Get Network</Button>
           <Button onClick={this.isExpectedNetwork}>Is Expected Network</Button>
