@@ -59,13 +59,28 @@ class Dashboard extends Component {
   }
 
   getAccount = () => {
-    const account = this.web3Proxy.getAccount();
-    this.props.addOutputLine(account?account:"undefined");
+    // const account = this.web3Proxy.getAccount();
+    // this.props.addOutputLine(account?account:"undefined");
+    this.web3Proxy.getAccounts().then(account=>{
+      this.props.addOutputLine(account);  
+    });
+  }
+
+  getAccounts = () => {
+    this.web3Proxy.getAccounts().then(accounts=>{
+      this.props.addOutputLine(JSON.stringify(accounts));  
+    });
+  }
+
+  getDesiredNetwork = () => {
+    this.web3Proxy.getDesiredNetwork().then(network=>{
+      this.props.addOutputLine(network.name);  
+    });
   }
 
   getNetwork = () => {
     this.web3Proxy.getNetwork().then(network=>{
-      this.props.addOutputLine(network);  
+      this.props.addOutputLine(network.name);  
     }).catch(reason=>{
       this.props.addOutputLine(reason);  
     });
@@ -96,6 +111,8 @@ class Dashboard extends Component {
       <DashboardConsole>
         <ControlStrip>
           <Button onClick={this.getAccount}>Get Account</Button>
+          <Button onClick={this.getAccounts}>Get Accounts</Button>
+          <Button onClick={this.getDesiredNetwork}>Get Desired Network</Button>
           <Button onClick={this.getNetwork}>Get Network</Button>
           <Button onClick={this.isExpectedNetwork}>Is Expected Network</Button>
         </ControlStrip>

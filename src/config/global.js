@@ -1,15 +1,8 @@
-/* eslint-disable */
-import { 
-    MAIN_NETWORK,
-    ROPSTEN_NETWORK,
-    MORDEN_NETWORK,
-    PRIVATE_NETWORK,
-} from '../web3/networks';
-/* eslint-enable */
+import networks from '../web3/networks';
 
 const config = { 
   contractAddress: '',
-  desiredNetwork: PRIVATE_NETWORK
+  desiredNetwork: networks.get()
 };
 
 export default config;
