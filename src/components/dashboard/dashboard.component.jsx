@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import config from 'react-global-configuration';
 import styled from 'styled-components';
 import Web3Proxy from '../../web3/web3-proxy';
-const abi = require('../../config/abi.json');
 
 const DashboardConsole = styled.div`
   background-color: lightblue;
@@ -67,7 +66,8 @@ class Dashboard extends Component {
 
   constructor (props) {
     super(props);
-    
+
+    const abi = JSON.parse(config.get('abi'));
     this.state = {
       transferAmount: 0,
       web3Proxy: new Web3Proxy(abi, config.get('contractAddress'), config.get('desiredNetwork'))
