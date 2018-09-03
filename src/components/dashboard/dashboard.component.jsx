@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import config from 'react-global-configuration';
 import styled from 'styled-components';
 import Web3Proxy from '../../web3/web3-proxy';
+const abi = require('../../config/abi.json');
 
 const DashboardConsole = styled.div`
   background-color: lightblue;
@@ -66,39 +67,43 @@ class Dashboard extends Component {
 
   constructor (props) {
     super(props);
-    this.web3Proxy = new Web3Proxy(config.get('desiredNetwork'));
+    
+    this.state = {
+      transferAmount: 0,
+      web3Proxy: new Web3Proxy(abi, config.get('contractAddress'), config.get('desiredNetwork'))
+    }
   }
 
   getDefaultAccount = () => {
-    const account = this.web3Proxy.getDefaultAccount();
+    const account = this.state.web3Proxy.getDefaultAccount();
     this.props.addOutputLine(account?account:"not set");
   }
 
   setDefaultAccount = () => {
-    this.web3Proxy.getAccounts().then(accounts=>{
+    this.state.web3Proxy.getAccounts().then(accounts=>{
       const account = (accounts.length > 0)?accounts[0]:"no account";
-      this.web3Proxy.setDefaultAccount(account);
+      this.state.web3Proxy.setDefaultAccount(account);
     });
   }
 
   getAccount = () => {
-    this.web3Proxy.getAccounts().then(accounts=>{
+    this.state.web3Proxy.getAccounts().then(accounts=>{
       const account = (accounts.length > 0)?accounts[0]:"no account";
       this.props.addOutputLine(account);  
     });
   }
 
   getAccounts = () => {
-    this.web3Proxy.getAccounts().then(accounts=>{
+    this.state.web3Proxy.getAccounts().then(accounts=>{
       this.props.addOutputLine(JSON.stringify(accounts));  
     });
   }
 
   getBalance = () => {
-    this.web3Proxy.getAccounts().then(accounts=>{
+    this.state.web3Proxy.getAccounts().then(accounts=>{
       const account = (accounts.length > 0)?accounts[0]:undefined;
       if (account) {
-        this.web3Proxy.getBalance(account).then(balance=>{
+        this.state.web3Proxy.getBalance(account).then(balance=>{
           this.props.addOutputLine(`${account}: ${balance}`);
         })
       }
@@ -106,19 +111,38 @@ class Dashboard extends Component {
   }
 
   getDesiredNetwork = () => {
-    this.props.addOutputLine(this.web3Proxy.getDefaultNetwork());
+    this.props.addOutputLine(this.state.web3Proxy.getDefaultNetwork());
   }
 
   getNetwork = () => {
-    this.web3Proxy.getNetwork().then(network=>{
+    this.state.web3Proxy.getNetwork().then(network=>{
       this.props.addOutputLine(network);
     }) 
   }
 
   isExpectedNetwork = () => {
-    this.web3Proxy.isDesiredNetwork().then(isExpected=>{
+    this.state.web3Proxy.isDesiredNetwork().then(isExpected=>{
       this.props.addOutputLine(isExpected?"TRUE":"FALSE");
     })
+  }
+
+  transfer = () => {
+    this.state.web3Proxy.getAccounts().then(accounts=>{
+      const sendingAddress = (accounts.length > 0)?accounts[0]:undefined;
+      if (sendingAddress) {
+        this.state.web3Proxy.transferTo(sendingAddress, config.get('beneficiaryAddress'), this.state.transferAmount)
+        .then(txHash=>{
+          this.props.addOutputLine(`TX: ${txHash}`);
+        })
+        .catch(error=>{
+          this.props.addOutputLine(`error: ${error}`);
+        })
+      } 
+    });
+  }
+
+  handleTransferAmountChange = (event) => {
+    this.setState({transferAmount: event.target.value});
   }
 
   clearTerminal = () => {
@@ -146,7 +170,7 @@ class Dashboard extends Component {
           <Button onClick={this.getDesiredNetwork}>Desired Network</Button>
           <Button onClick={this.getNetwork}>Get Network</Button>
           <Button onClick={this.isExpectedNetwork}>Is Expected Network</Button>
-          <Stepper type={"number"} name={"points"} step={1000} min={0}/>
+          <Stepper type={"number"} value={this.state.transferAmount} onChange={this.handleTransferAmountChange} name={"points"} step={1000} min={0}/>
           <Button onClick={this.transfer}>Transfer</Button>
         </ControlStrip>
         <TerminalConsole>
