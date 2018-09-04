@@ -26,7 +26,15 @@ export default class Web3Proxy {
     }
 
     getBalance = (account) => {
-        return this._web3.eth.getBalance(account);
+        const contract = this._contract;
+
+        return new Promise((resolve, reject) => {
+            contract.methods.balanceOf(account)
+            .call({ from: account })
+            .then(result=>{
+                resolve(result);
+            });
+        })        
     }    
     
     getDefaultAccount = () => {
@@ -68,6 +76,42 @@ export default class Web3Proxy {
             .on('error', error=>{
                 reject(error)
             });                
+        })
+    }
+
+    setMinter = (mintingAddress) => {
+        const contract = this._contract;
+
+        return new Promise((resolve, reject) => {
+            contract.methods.setMinter(mintingAddress)
+            .send({ from: mintingAddress })
+            .on('transactionHash', hash=>{
+                resolve(hash);
+            })
+            .on('error', error=>{
+                reject(error)
+            })
+            .on('receipt', function(receipt){
+                console.log(receipt.contractAddress) // contains the new contract address
+            });
+        })
+    }
+
+    mintTo = (mintingAddress, beneficiaryAddress, amount) => {
+        const contract = this._contract;
+
+        return new Promise((resolve, reject) => {
+            contract.methods.mint(beneficiaryAddress, amount)
+            .send({ from: mintingAddress })
+            .on('transactionHash', hash=>{
+                resolve(hash);
+            })
+            .on('error', error=>{
+                reject(error)
+            })
+            .on('receipt', function(receipt){
+                console.log(receipt.contractAddress) // contains the new contract address
+            });
         })
     }
 }

@@ -35,7 +35,7 @@ const Button = styled.button`
   font-size: 14px;
 `;
 
-const Stepper = styled.input`
+const InputField = styled.input`
   height: 25px;
   min-width: 150px;
   color: black;
@@ -69,7 +69,8 @@ class Dashboard extends Component {
 
     const abi = JSON.parse(config.get('abi'));
     this.state = {
-      transferAmount: 0,
+      quantityToMint: 0,
+      accountToMintTo: '',
       web3Proxy: new Web3Proxy(abi, config.get('contractAddress'), config.get('desiredNetwork'))
     }
   }
@@ -130,7 +131,7 @@ class Dashboard extends Component {
     this.state.web3Proxy.getAccounts().then(accounts=>{
       const sendingAddress = (accounts.length > 0)?accounts[0]:undefined;
       if (sendingAddress) {
-        this.state.web3Proxy.transferTo(sendingAddress, config.get('beneficiaryAddress'), this.state.transferAmount)
+        this.state.web3Proxy.transferTo(sendingAddress, config.get('beneficiaryAddress'), this.state.quantityToMint)
         .then(txHash=>{
           this.props.addOutputLine(`TX: ${txHash}`);
         })
@@ -141,8 +142,44 @@ class Dashboard extends Component {
     });
   }
 
-  handleTransferAmountChange = (event) => {
-    this.setState({transferAmount: event.target.value});
+  setMinter = () => {
+    this.state.web3Proxy.getAccounts().then(accounts=>{
+      const mintingAddress = (accounts.length > 0)?accounts[0]:undefined;
+      if (mintingAddress) {
+        this.state.web3Proxy.setMinter(mintingAddress)
+        .then(response=>{
+          this.props.addOutputLine(`response: ${response}`);
+        })
+        .catch(error=>{
+          this.props.addOutputLine(`error: ${error}`);
+        })
+      } 
+    });
+  }
+
+  mint = () => {
+    if (this.state.accountToMintTo) {
+      this.state.web3Proxy.getAccounts().then(accounts=>{
+        const mintingAddress = (accounts.length > 0)?accounts[0]:undefined;
+        if (mintingAddress) {
+          this.state.web3Proxy.mintTo(mintingAddress, this.state.accountToMintTo, this.state.quantityToMint)
+          .then(txHash=>{
+            this.props.addOutputLine(`TX: ${txHash}`);
+          })
+          .catch(error=>{
+            this.props.addOutputLine(`error: ${error}`);
+          })
+        } 
+      });
+      }
+  }
+
+  handleMintQuantityChange = (event) => {
+    this.setState({quantityToMint: event.target.value});
+  }
+
+  handleAccountToMintToChange = (event) => {
+    this.setState({accountToMintTo: event.target.value});
   }
 
   clearTerminal = () => {
@@ -163,15 +200,11 @@ class Dashboard extends Component {
     return (
       <DashboardConsole>
         <ControlStrip>
-          <Button onClick={this.getDefaultAccount}>Get Default Account</Button>
-          <Button onClick={this.setDefaultAccount}>Set Default Account</Button>
-          <Button onClick={this.getAccounts}>Accounts</Button>
           <Button onClick={this.getBalance}>Balance</Button>
-          <Button onClick={this.getDesiredNetwork}>Desired Network</Button>
-          <Button onClick={this.getNetwork}>Get Network</Button>
-          <Button onClick={this.isExpectedNetwork}>Is Expected Network</Button>
-          <Stepper type={"number"} value={this.state.transferAmount} onChange={this.handleTransferAmountChange} name={"points"} step={1000} min={0}/>
-          <Button onClick={this.transfer}>Transfer</Button>
+          <Button onClick={this.setMinter}>Set Minter</Button>
+          <InputField type={"number"} value={this.state.quantityToMint} onChange={this.handleMintQuantityChange} step={1000} min={0} />
+          <Button onClick={this.mint}>Mint To</Button>
+          <InputField value={this.state.accountToMintTo} onChange={this.handleAccountToMintToChange} />
         </ControlStrip>
         <TerminalConsole>
           <OutputLineList>
